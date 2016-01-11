@@ -10,7 +10,7 @@
 		- 第一个参数`table`是要进行图片拉伸的图片加载到的`table`，
 		- 第二个参数`percent`是想要在不拉伸的情况下需要展示的比例。
 - 使用的时候，就一句代码，然后不用再做其他任何操作:
-`[[AUUFlexibleHeader flexibleForTable:self.tableView withVisiablePercent:0.6] flexibleImage:[UIImage imageNamed:@"pic.jpg"]];`
+`self.stretchyHeader = [[AUUStretchyHeader stretchForTable:self.tableView] stretchyImage:[UIImage imageNamed:@"pic.jpg"]];`
 
 ----
 		
