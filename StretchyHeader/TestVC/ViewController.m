@@ -32,7 +32,6 @@
     self.view.backgroundColor = [UIColor whiteColor];
     
     self.tableView = [[UITableView alloc] initWithFrame:self.view.bounds style:UITableViewStylePlain];
-    self.tableView.frame = CGRectMake(0, 0, 280, CGRectGetHeight([UIScreen mainScreen].bounds));
     self.tableView.delegate = self;
     self.tableView.dataSource = self;
     [self.view addSubview:self.tableView];
@@ -45,7 +44,9 @@
     
     /******************************* 伸缩头部视图简单的使用 *******************************/
     
-    self.stretchyHeader = [[AUUStretchyHeader stretchForTable:self.tableView] stretchyImage:[UIImage imageNamed:@"pic.jpg"]];
+//    self.stretchyHeader = [[AUUStretchyHeader stretchForTable:self.tableView] stretchyImage:[UIImage imageNamed:@"pic.jpg"]];
+//    self.stretchyHeader = [[AUUStretchyHeader stretchForTable:self.tableView] stretchyImageWithURLString:@"http://beta2.hichao.com/v1/h264.png"];
+    self.stretchyHeader = [[AUUStretchyHeader stretchForTable:self.tableView] stretchyImageWithURLString:@"http://pic4.nipic.com/20090805/1199250_002332425_2.jpg" imageSize:CGSizeMake(1024, 768)];
     [self.stretchyHeader stretchyHeaderHeightChanged:^(CGFloat height) {
         NSLog(@"%.2f", height);
     }];

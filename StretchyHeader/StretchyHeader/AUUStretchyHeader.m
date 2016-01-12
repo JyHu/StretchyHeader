@@ -8,6 +8,23 @@
 
 #import "AUUStretchyHeader.h"
 
+#if defined(__has_include) && __has_include("UIImageView+WebCache.h")
+#   define _HasSD
+#endif
+
+#ifdef _HasSD
+#   import "UIImageView+WebCache.h"
+#else
+#   if defined(__has_include) && __has_include(<UIImageView+WebCache.h>)
+#       define _HasSD
+#   endif
+#   ifdef _HasSD
+#   import <UIImageView+WebCache.h>
+#   endif
+#endif
+
+
+
 @interface UIView (_AUUView)
 
 @property (assign, nonatomic) CGFloat p_viewXOrigin;
@@ -57,34 +74,20 @@
 
 @end
 
-@interface UIImage (_AUUImage)
-
-@property (assign, nonatomic, readonly) CGFloat p_width;
-
-@property (assign, nonatomic, readonly) CGFloat p_height;
-
-- (CGFloat)scaledWithTargetHeight:(CGFloat)height;
-
-- (CGFloat)scaledWithTargetWidth:(CGFloat)width;
-
-@end
-
-@implementation UIImage (_AUUImage)
-
-- (CGFloat)p_width { return self.size.width; }
-
-- (CGFloat)p_height { return self.size.height; }
-
-- (CGFloat)scaledWithTargetHeight:(CGFloat)height { return self.p_width / self.p_height * height; }
-
-- (CGFloat)scaledWithTargetWidth:(CGFloat)width { return self.p_height / self.p_width * width; }
-
-@end
 
 
+extern CGFloat scaledSizeWithTargetHeight(CGSize size, CGFloat height);
+extern CGFloat scaledSizeWithTargetWidth(CGSize size, CGFloat width);
 
+CGFloat scaledSizeWithTargetHeight(CGSize size, CGFloat height)
+{
+    return size.width / size.height * height;
+}
 
-
+CGFloat scaledSizeWithTargetWidth(CGSize size, CGFloat width)
+{
+    return size.height / size.width * width;
+}
 
 
 
@@ -151,15 +154,6 @@
 @property (assign, nonatomic) CGFloat p_stretchyBackgroundHeight;
 
 /**
- *  @author 胡金友, 16-01-11 11:09:58
- *
- *  @brief  用来伸缩展示的image
- *
- *  @since 1.0
- */
-@property (retain, nonatomic) UIImage *p_stretchyImage;
-
-/**
  *  @author JyHu, 16-01-11 12:01:24
  *
  *  可视的头部高度变化的时候回传信息的block
@@ -167,6 +161,15 @@
  *  @since v1.0
  */
 @property (copy, nonatomic) void (^heightChangedBlock)(CGFloat height);
+
+/**
+ *  @author JyHu, 16-01-13 03:01:17
+ *
+ *  如果加载网络图片，需要展示一个等待提示器
+ *
+ *  @since v1.0
+ */
+@property (retain, nonatomic) UIActivityIndicatorView *indicatorView;
 
 @end
 
@@ -193,7 +196,7 @@
 
 - (id)initWithTableView:(UITableView *)tableView withVisiablePercent:(CGFloat)percent
 {
-    self = [self init];
+    self = [super init];
     
     if (self)
     {
@@ -202,6 +205,7 @@
         
         [self initlization];
     }
+    
     return self;
 }
 
@@ -216,35 +220,109 @@
                             self.p_tableView.p_viewWidth,
                             self.p_stretchyBackgroundHeight);
     self.clipsToBounds = YES;
-    self.backgroundColor = [UIColor redColor];
+    self.backgroundColor = [UIColor clearColor];
     [self.p_tableView addSubview:self];
+    
+    self.p_imageView = [[UIImageView alloc] init];
+    self.p_imageView.backgroundColor = [UIColor colorWithRed:(54 / 255.0) green:(100 / 255.0) blue:(139 / 255.0) alpha:1];
 }
 
 - (id)stretchyImage:(UIImage *)image
 {
     if (image)
     {
-        self.p_stretchyImage = image;
-        
-        [self setup];
+        [self setupWithImage:image];
     }
     
     return self;
 }
 
+#ifdef _HasSD
+
+- (id)stretchyImageWithURLString:(NSString *)imageURLString imageSize:(CGSize)size
+{
+    return [self stretchyImageWithURLString:imageURLString placeHolderImage:nil imageSize:size];
+}
+
+- (id)stretchyImageWithURLString:(NSString *)imageURLString placeHolderImage:(UIImage *)image imageSize:(CGSize)size
+{
+    [self setupWithImageSize:size];
+    
+    self.indicatorView = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleWhiteLarge];
+    [self.indicatorView startAnimating];
+    [self addSubview:self.indicatorView];
+    
+#ifdef _HasSD
+    
+    if ([self.p_imageView respondsToSelector:@selector(sd_setImageWithURL:placeholderImage:completed:)])
+    {
+        [self.p_imageView sd_setImageWithURL:[NSURL URLWithString:imageURLString]
+                            placeholderImage:image
+                                   completed:^(UIImage *image,
+                                               NSError *error,
+                                               SDImageCacheType cacheType,
+                                               NSURL *imageURL) {
+                                       
+            self.indicatorView.hidden = YES;
+        }];
+    }
+    else if ([self.p_imageView respondsToSelector:@selector(setImageWithURL:placeholderImage:completed:)])
+    {
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
+        __weak AUUStretchyHeader *weakSelf = self;
+        [self.p_imageView setImageWithURL:[NSURL URLWithString:imageURLString]
+                         placeholderImage:image
+                                completed:^(UIImage *image,
+                                            NSError *error,
+                                            SDImageCacheType cacheType) {
+                                    
+            weakSelf.indicatorView.hidden = YES;
+        }];
+#pragma clang diagnostic pop
+    }
+    
+#else
+    
+    __weak AUUStretchyHeader *weakSelf = self;
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+        NSData *imageData = [NSData dataWithContentsOfURL:[NSURL URLWithString:imageURLString]];
+        UIImage *downloadImage = [UIImage imageWithData:imageData];
+        dispatch_async(dispatch_get_main_queue(), ^{
+            weakSelf.p_imageView.image = downloadImage;
+            weakSelf.indicatorView.hidden = YES;
+        });
+    });
+    
+#endif
+    
+    return self;
+}
+
+#endif
+
+- (void)setupWithImage:(UIImage *)image
+{
+    self.p_imageView.image = image;
+    [self setupWithImageSize:image.size];
+}
+
+- (void)setupWithImageSize:(CGSize)size
+{
+    self.p_stretchyBackgroundHeight = scaledSizeWithTargetWidth(size, self.p_viewWidth);
+    self.p_visibleHeight = self.p_stretchyBackgroundHeight * self.p_visiblePercent;
+    
+    [self setup];
+}
+
 - (void)setup
 {
-    self.p_stretchyBackgroundHeight = [self.p_stretchyImage scaledWithTargetWidth:self.p_viewWidth];
-    self.p_visibleHeight            = self.p_stretchyBackgroundHeight * self.p_visiblePercent;
-    
     self.p_tableView.contentInset   = UIEdgeInsetsMake(self.p_visibleHeight - 64, 0, 0, 0);
     self.p_viewYOrigin              = -1 * self.p_stretchyBackgroundHeight;
     self.p_viewHeight               = self.p_stretchyBackgroundHeight;
     
     CGFloat extraHalfY = (self.p_stretchyBackgroundHeight - self.p_visibleHeight) / 2.0;
     
-    self.p_imageView                = [[UIImageView alloc] init];
-    self.p_imageView.image          = self.p_stretchyImage;
     self.p_imageView.contentMode    = UIViewContentModeScaleAspectFit;
     self.p_imageView.frame          = self.bounds;
     self.p_imageView.p_viewYOrigin  = extraHalfY;
@@ -284,7 +362,6 @@
 #pragma mark - notify methods
 
 - (void)stretchyHeaderHeightChanged:(void (^)(CGFloat))heightChanged
-
 
 {
     self.heightChangedBlock = heightChanged;
@@ -389,6 +466,7 @@
         self.p_viewYOrigin = -1 * self.p_stretchyBackgroundHeight + offset.y + 64;
     }
     
+    CGFloat headerHeight = (offset.y >= -64 ? 64 : fabs(offset.y));
     
     if (self.heightChangedBlock)
     {
@@ -399,7 +477,13 @@
          *
          *  @since v1.0
          */
-        self.heightChangedBlock(offset.y >= -64 ? 64 : fabs(offset.y));
+        self.heightChangedBlock(headerHeight);
+    }
+    
+    if (self.indicatorView != nil && self.indicatorView.superview == self)
+    {
+        self.indicatorView.center = CGPointMake(self.p_tableView.p_viewWidth / 2.0,
+                                                self.p_stretchyBackgroundHeight - headerHeight / 2.0);
     }
 }
 

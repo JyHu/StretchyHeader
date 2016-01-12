@@ -6,7 +6,19 @@
 //  Copyright © 2016年 胡金友. All rights reserved.
 //
 
+
+
 #import <UIKit/UIKit.h>
+
+
+
+
+
+
+
+
+
+
 
 /**
  *  @author JyHu, 16-01-11 10:01:24
@@ -58,6 +70,35 @@
  *  @since v1.0
  */
 - (id)stretchyImage:(UIImage *)image;
+
+/**
+ *  @author JyHu, 16-01-13 03:01:18
+ *
+ *  可以加载网络图片,如果使用SDWebImage，可以做到的效果更好
+ *
+ *  @param imageURLString 网络图片地址
+ *  @param size           图片的大小，需要事先设置好，不然在网络不好的时候滑动会出现跳动的情况
+ *
+ *  @return self
+ *
+ *  @since v1.0
+ */
+- (id)stretchyImageWithURLString:(NSString *)imageURLString imageSize:(CGSize)size;
+
+/**
+ *  @author JyHu, 16-01-13 03:01:44
+ *
+ *  可以加载网络图片,如果使用SDWebImage，可以做到的效果更好
+ *
+ *  @param imageURLString 图片网络地址
+ *  @param image          暂时显示的图片
+ *  @param size           图片的大小，需要预先设置好，不然在网络不好的时候滑动会出现跳动的情况
+ *
+ *  @return self
+ *
+ *  @since v1.0
+ */
+- (id)stretchyImageWithURLString:(NSString *)imageURLString placeHolderImage:(UIImage *)image imageSize:(CGSize)size;
 
 /**
  *  @author JyHu, 16-01-11 10:01:14
