@@ -19,10 +19,15 @@
  *
  *  可以伸缩的头部视图，秩序设置一张图片，即可自动的完成伸缩的过程。
  *
- *  头部的高度是根据图片计算得出，图片要铺展到table得宽度，然后按比例计算高度，即为顶部的高度
+ *  头部的高度是根据图片计算得出，图片要铺展到table得宽度，然后按比例计算高度，即为顶部的高度。
+ *
+ *  如果用户需要添加自己的一些视图控件，需要加载到containerView上，如果加在self上，将不好控制位置。
  *
  *  @since v1.0
  */
+
+
+
 @interface AUUStretchyHeader : UIView
 
 /**
@@ -115,12 +120,21 @@
 /**
  *  @author JyHu, 16-01-11 10:01:58
  *
- *  顶部高度每次变化的时候回传信息的block
+ *  顶部高度每次变化的时候回传信息的block，可以用来更新containerView上得视图
  *
  *  @param heightChanged 回传的block
  *
  *  @since v1.0
  */
 - (void)stretchyHeaderHeightChanged:(void (^)(CGFloat height))heightChanged;
+
+/**
+ *  @author JyHu, 16-01-13 20:01:10
+ *
+ *  预留出来的附加视图，使用者可以将自定义的一些视图加在这个view上
+ *
+ *  @since v1.0
+ */
+@property (retain, nonatomic) UIView *containerView;
 
 @end

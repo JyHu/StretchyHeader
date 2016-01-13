@@ -27,48 +27,48 @@
 
 @interface UIView (_AUUView)
 
-@property (assign, nonatomic) CGFloat p_viewXOrigin;
-@property (assign, nonatomic) CGFloat p_viewYOrigin;
-@property (assign, nonatomic) CGFloat p_viewWidth;
-@property (assign, nonatomic) CGFloat p_viewHeight;
+@property (assign, nonatomic) CGFloat _viewXOrigin;
+@property (assign, nonatomic) CGFloat _viewYOrigin;
+@property (assign, nonatomic) CGFloat _viewWidth;
+@property (assign, nonatomic) CGFloat _viewHeight;
 
 @end
 
 @implementation UIView (_AUUView)
 
-- (CGFloat)p_viewXOrigin { return self.frame.origin.x; }
+- (CGFloat)_viewXOrigin { return self.frame.origin.x; }
 
-- (void)setP_viewXOrigin:(CGFloat)p_viewXOrigin
+- (void)set_viewXOrigin:(CGFloat)_viewXOrigin
 {
     CGRect rect = self.frame;
-    rect.origin.x = p_viewXOrigin;
+    rect.origin.x = _viewXOrigin;
     self.frame = rect;
 }
 
-- (CGFloat)p_viewYOrigin { return self.frame.origin.y; }
+- (CGFloat)_viewYOrigin { return self.frame.origin.y; }
 
-- (void)setP_viewYOrigin:(CGFloat)p_viewYOrigin
+- (void)set_viewYOrigin:(CGFloat)_viewYOrigin
 {
     CGRect rect = self.frame;
-    rect.origin.y = p_viewYOrigin;
+    rect.origin.y = _viewYOrigin;
     self.frame = rect;
 }
 
-- (CGFloat)p_viewHeight { return self.frame.size.height; }
+- (CGFloat)_viewHeight { return self.frame.size.height; }
 
-- (void)setP_viewHeight:(CGFloat)p_viewHeight
+- (void)set_viewHeight:(CGFloat)_viewHeight
 {
     CGRect rect = self.frame;
-    rect.size.height = p_viewHeight;
+    rect.size.height = _viewHeight;
     self.frame = rect;
 }
 
-- (CGFloat)p_viewWidth { return self.frame.size.width; }
+- (CGFloat)_viewWidth { return self.frame.size.width; }
 
-- (void)setP_viewWidth:(CGFloat)p_viewWidth
+- (void)set_viewWidth:(CGFloat)_viewWidth
 {
     CGRect rect = self.frame;
-    rect.size.width = p_viewWidth;
+    rect.size.width = _viewWidth;
     self.frame = rect;
 }
 
@@ -219,14 +219,16 @@ CGFloat scaledSizeWithTargetWidth(CGSize size, CGFloat width)
     self.headZoomIn = YES;                  // 默认的头部是可伸缩的
     
     self.frame = CGRectMake(0, -1 * self.p_stretchyBackgroundHeight,
-                            self.p_tableView.p_viewWidth,
+                            self.p_tableView._viewWidth,
                             self.p_stretchyBackgroundHeight);
     self.clipsToBounds = YES;
     self.backgroundColor = [UIColor clearColor];
     [self.p_tableView addSubview:self];
     
     self.p_imageView = [[UIImageView alloc] init];
-    self.p_imageView.backgroundColor = [UIColor colorWithRed:(54/255.0) green:(100/255.0) blue:(139/255.0) alpha:1];
+    
+    self.containerView = [[UIView alloc] initWithFrame:CGRectZero];
+    self.containerView.backgroundColor = [UIColor clearColor];
 }
 
 
@@ -251,11 +253,22 @@ CGFloat scaledSizeWithTargetWidth(CGSize size, CGFloat width)
 {
     [self setupWithImageSize:size];
     
+    /**
+     初始化一个视图等待指示器，加载到self的subView上，不加载到containerView上，是因为，避免指示器被用户加载的视图挡住
+     */
     self.indicatorView = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleWhiteLarge];
     [self.indicatorView startAnimating];
     [self addSubview:self.indicatorView];
     
 #ifdef _HasSD
+    
+    /**
+     *  @author JyHu, 16-01-13 20:01:40
+     *
+     *  使用SDWebImage来做图片的下载和缓存
+     *
+     *  @since v.0
+     */
     
     if ([self.p_imageView respondsToSelector:@selector(sd_setImageWithURL:placeholderImage:completed:)])
     {
@@ -284,19 +297,20 @@ CGFloat scaledSizeWithTargetWidth(CGSize size, CGFloat width)
         }];
 #pragma clang diagnostic pop
     }
-    
-#else
-    
-    __weak AUUStretchyHeader *weakSelf = self;
-    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-        NSData *imageData = [NSData dataWithContentsOfURL:[NSURL URLWithString:imageURLString]];
-        UIImage *downloadImage = [UIImage imageWithData:imageData];
-        dispatch_async(dispatch_get_main_queue(), ^{
-            weakSelf.p_imageView.image = downloadImage;
-            weakSelf.indicatorView.hidden = YES;
+    else
+    {
+#endif
+        __weak AUUStretchyHeader *weakSelf = self;
+        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+            NSData *imageData = [NSData dataWithContentsOfURL:[NSURL URLWithString:imageURLString]];
+            UIImage *downloadImage = [UIImage imageWithData:imageData];
+            dispatch_async(dispatch_get_main_queue(), ^{
+                weakSelf.p_imageView.image = downloadImage;
+                weakSelf.indicatorView.hidden = YES;
+            });
         });
-    });
-    
+#ifdef _HasSD
+    }
 #endif
     
     return self;
@@ -328,21 +342,24 @@ CGFloat scaledSizeWithTargetWidth(CGSize size, CGFloat width)
  */
 - (void)setupWithImageSize:(CGSize)size
 {
-    self.p_stretchyBackgroundHeight = scaledSizeWithTargetWidth(size, self.p_viewWidth);
+    self.p_stretchyBackgroundHeight = scaledSizeWithTargetWidth(size, self._viewWidth);
     self.p_visibleHeight = self.p_stretchyBackgroundHeight * self.p_visiblePercent;
     
     self.p_tableView.contentInset   = UIEdgeInsetsMake(self.p_visibleHeight - 64, 0, 0, 0);
-    self.p_viewYOrigin              = -1 * self.p_stretchyBackgroundHeight;
-    self.p_viewHeight               = self.p_stretchyBackgroundHeight;
+    self._viewYOrigin              = -1 * self.p_stretchyBackgroundHeight;
+    self._viewHeight               = self.p_stretchyBackgroundHeight;
     
     CGFloat extraHalfY = (self.p_stretchyBackgroundHeight - self.p_visibleHeight) / 2.0;
     
+    self.p_imageView.backgroundColor = [UIColor colorWithRed:(54/255.0) green:(100/255.0) blue:(139/255.0) alpha:1];
     self.p_imageView.contentMode    = UIViewContentModeScaleAspectFit;
     self.p_imageView.frame          = self.bounds;
-    self.p_imageView.p_viewYOrigin  = extraHalfY;
+    self.p_imageView._viewYOrigin  = extraHalfY;
     [self addSubview:self.p_imageView];
     
     self.p_tableView.scrollIndicatorInsets = UIEdgeInsetsMake(-64, 0, 0, 0);
+    
+    [self addSubview:self.containerView];
     
     [self trigger];
     
@@ -411,7 +428,7 @@ CGFloat scaledSizeWithTargetWidth(CGSize size, CGFloat width)
          *
          *  @since 1.0
          */
-        self.p_imageView.p_viewYOrigin = (self.p_stretchyBackgroundHeight + offset.y) / 2.0;
+        self.p_imageView._viewYOrigin = (self.p_stretchyBackgroundHeight + offset.y) / 2.0;
     }
     else if (offset.y < -1 * self.p_stretchyBackgroundHeight)
     {
@@ -427,13 +444,13 @@ CGFloat scaledSizeWithTargetWidth(CGSize size, CGFloat width)
             self.clipsToBounds = NO;
             
             // 扩大的比例
-            CGFloat scale = fabs(offset.y) / self.p_viewHeight;
+            CGFloat scale = fabs(offset.y) / self._viewHeight;
             
             // 放大图片
             self.p_imageView.transform = CGAffineTransformScale(self.p_imageView.transform, scale, scale);
             
             // 每次放大的时候是以图片的中心放大，需要重设y坐标
-            self.p_imageView.p_viewYOrigin = self.p_viewHeight - self.p_imageView.p_viewHeight;
+            self.p_imageView._viewYOrigin = self._viewHeight - self.p_imageView._viewHeight;
         }
         else
         {
@@ -445,7 +462,7 @@ CGFloat scaledSizeWithTargetWidth(CGSize size, CGFloat width)
              *  @since 1.0
              */
             self.p_tableView.contentOffset = CGPointMake(0, -1 * self.p_stretchyBackgroundHeight);
-            self.p_imageView.p_viewYOrigin = 0;
+            self.p_imageView._viewYOrigin = 0;
         }
     }
     else if (offset.y < -64)
@@ -457,7 +474,7 @@ CGFloat scaledSizeWithTargetWidth(CGSize size, CGFloat width)
          *
          *  @since 1.0
          */
-        self.p_viewYOrigin = -1 * self.p_stretchyBackgroundHeight;
+        self._viewYOrigin = -1 * self.p_stretchyBackgroundHeight;
         
         /**
          *  @author JyHu, 16-01-11 10:09:27
@@ -466,7 +483,7 @@ CGFloat scaledSizeWithTargetWidth(CGSize size, CGFloat width)
          *
          *  @since 1.0
          */
-        self.p_imageView.p_viewYOrigin = (self.p_stretchyBackgroundHeight + offset.y) / 2.0;
+        self.p_imageView._viewYOrigin = (self.p_stretchyBackgroundHeight + offset.y) / 2.0;
     }
     else
     {
@@ -477,9 +494,16 @@ CGFloat scaledSizeWithTargetWidth(CGSize size, CGFloat width)
          *
          *  @since 1.0
          */
-        self.p_viewYOrigin = -1 * self.p_stretchyBackgroundHeight + offset.y + 64;
+        self._viewYOrigin = -1 * self.p_stretchyBackgroundHeight + offset.y + 64;
     }
     
+    /**
+     *  @author JyHu, 16-01-13 20:01:54
+     *
+     *  当前头部视图的可视高度
+     *
+     *  @since v1.0
+     */
     CGFloat headerHeight = (offset.y >= -64 ? 64 : fabs(offset.y));
     
     if (self.heightChangedBlock)
@@ -494,9 +518,18 @@ CGFloat scaledSizeWithTargetWidth(CGSize size, CGFloat width)
         self.heightChangedBlock(headerHeight);
     }
     
+    self.containerView.frame = CGRectMake(0, self.p_stretchyBackgroundHeight - headerHeight, self.p_tableView._viewWidth, headerHeight);
+    
+    /**
+     *  @author JyHu, 16-01-13 17:01:16
+     *
+     *  如果有等待视图的话，需要动态的设置它居中
+     *
+     *  @since v1.0
+     */
     if (self.indicatorView != nil && self.indicatorView.superview == self)
     {
-        self.indicatorView.center = CGPointMake(self.p_tableView.p_viewWidth / 2.0,
+        self.indicatorView.center = CGPointMake(self._viewWidth / 2.0,
                                                 self.p_stretchyBackgroundHeight - headerHeight / 2.0);
     }
 }

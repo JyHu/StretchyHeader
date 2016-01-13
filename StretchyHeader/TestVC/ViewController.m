@@ -46,7 +46,7 @@
     
 //    self.stretchyHeader = [[AUUStretchyHeader stretchForTable:self.tableView] stretchyImage:[UIImage imageNamed:@"pic.jpg"]];
 //    self.stretchyHeader = [[AUUStretchyHeader stretchForTable:self.tableView] stretchyImageWithURLString:@"http://beta2.hichao.com/v1/h264.png"];
-    self.stretchyHeader = [[AUUStretchyHeader stretchForTable:self.tableView] stretchyImageWithURLString:@"http://pic4.nipic.com/20090805/1199250_002332425_2.jpg" imageSize:CGSizeMake(1024, 768)];
+    self.stretchyHeader = [[AUUStretchyHeader stretchForTable:self.tableView] stretchyImageWithURLString:@"http://pic37.nipic.com/20140209/8821914_163234218136_2.jpg" imageSize:CGSizeMake(1024, 640)];
     [self.stretchyHeader stretchyHeaderHeightChanged:^(CGFloat height) {
         NSLog(@"%.2f", height);
     }];
