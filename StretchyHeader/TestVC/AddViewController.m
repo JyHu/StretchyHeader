@@ -2,8 +2,8 @@
 //  AddViewController.m
 //  AspectHeader
 //
-//  Created by 胡金友 on 9/29/15.
-//  Copyright © 2015 胡金友. All rights reserved.
+//  Created by JyHu on 9/29/15.
+//  Copyright © 2015 JyHu. All rights reserved.
 //
 
 #import "AddViewController.h"

@@ -2,8 +2,8 @@
 //  AppDelegate.m
 //  StretchyHeader
 //
-//  Created by 胡金友 on 16/1/11.
-//  Copyright © 2016年 胡金友. All rights reserved.
+//  Created by JyHu on 16/1/11.
+//  Copyright © 2016年 JyHu. All rights reserved.
 //
 
 #import "AppDelegate.h"

@@ -2,19 +2,13 @@
 //  AUUStretchyHeader.h
 //  StretchyHeader
 //
-//  Created by 胡金友 on 16/1/11.
-//  Copyright © 2016年 胡金友. All rights reserved.
+//  Created by JyHu on 16/1/11.
+//  Copyright © 2016年 JyHu. All rights reserved.
 //
 
 
 
 #import <UIKit/UIKit.h>
-
-
-
-
-
-
 
 
 
@@ -112,7 +106,7 @@
 /**
  *  @author JyHu, 16-01-11 10:01:28
  *
- *  导航栏是否透明，主要是为了设置tabl的verticalIndicator的位置
+ *  导航栏是否透明，主要是为了设置table的verticalIndicator的位置
  *
  *  @since v1.0
  */

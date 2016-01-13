@@ -2,8 +2,8 @@
 //  AUUStretchyHeader.m
 //  StretchyHeader
 //
-//  Created by 胡金友 on 16/1/11.
-//  Copyright © 2016年 胡金友. All rights reserved.
+//  Created by JyHu on 16/1/11.
+//  Copyright © 2016年 JyHu. All rights reserved.
 //
 
 #import "AUUStretchyHeader.h"
@@ -76,18 +76,14 @@
 
 
 
-extern CGFloat scaledSizeWithTargetHeight(CGSize size, CGFloat height);
 extern CGFloat scaledSizeWithTargetWidth(CGSize size, CGFloat width);
-
-CGFloat scaledSizeWithTargetHeight(CGSize size, CGFloat height)
-{
-    return size.width / size.height * height;
-}
 
 CGFloat scaledSizeWithTargetWidth(CGSize size, CGFloat width)
 {
     return size.height / size.width * width;
 }
+
+
 
 
 
@@ -109,7 +105,7 @@ CGFloat scaledSizeWithTargetWidth(CGSize size, CGFloat width)
 
 
 /**
- *  @author 胡金友, 16-01-11 11:09:14
+ *  @author JyHu, 16-01-11 11:09:14
  *
  *  @brief  关联的table，弱引用
  *
@@ -118,7 +114,7 @@ CGFloat scaledSizeWithTargetWidth(CGSize size, CGFloat width)
 @property (weak, nonatomic) UITableView *p_tableView;
 
 /**
- *  @author 胡金友, 16-01-11 11:09:51
+ *  @author JyHu, 16-01-11 11:09:51
  *
  *  @brief  伸缩图片的背景容器
  *
@@ -127,7 +123,7 @@ CGFloat scaledSizeWithTargetWidth(CGSize size, CGFloat width)
 @property (retain, nonatomic) UIImageView *p_imageView;
 
 /**
- *  @author 胡金友, 16-01-11 11:09:31
+ *  @author JyHu, 16-01-11 11:09:31
  *
  *  @brief  设置的不伸缩的时候，默认的可是高度占整个高度的比例
  *
@@ -136,7 +132,7 @@ CGFloat scaledSizeWithTargetWidth(CGSize size, CGFloat width)
 @property (assign, nonatomic) CGFloat p_visiblePercent;
 
 /**
- *  @author 胡金友, 16-01-11 11:09:13
+ *  @author JyHu, 16-01-11 11:09:13
  *
  *  @brief  不伸缩的时候，默认的可视高度，计算出来的
  *
@@ -145,7 +141,7 @@ CGFloat scaledSizeWithTargetWidth(CGSize size, CGFloat width)
 @property (assign, nonatomic) CGFloat p_visibleHeight;
 
 /**
- *  @author 胡金友, 16-01-11 11:09:35
+ *  @author JyHu, 16-01-11 11:09:35
  *
  *  @brief  背景容器高度，也是跟图片高度相同
  *
@@ -209,8 +205,14 @@ CGFloat scaledSizeWithTargetWidth(CGSize size, CGFloat width)
     return self;
 }
 
-#pragma mark - layout methods
 
+/**
+ *  @author JyHu, 16-01-13 16:01:17
+ *
+ *  一些必要参数的设置
+ *
+ *  @since v1.0
+ */
 - (void)initlization
 {
     self.p_stretchyBackgroundHeight = 300;  // 初始高度，在设置图片的时候需要重新计算
@@ -224,8 +226,11 @@ CGFloat scaledSizeWithTargetWidth(CGSize size, CGFloat width)
     [self.p_tableView addSubview:self];
     
     self.p_imageView = [[UIImageView alloc] init];
-    self.p_imageView.backgroundColor = [UIColor colorWithRed:(54 / 255.0) green:(100 / 255.0) blue:(139 / 255.0) alpha:1];
+    self.p_imageView.backgroundColor = [UIColor colorWithRed:(54/255.0) green:(100/255.0) blue:(139/255.0) alpha:1];
 }
+
+
+#pragma mark - layout methods
 
 - (id)stretchyImage:(UIImage *)image
 {
@@ -236,8 +241,6 @@ CGFloat scaledSizeWithTargetWidth(CGSize size, CGFloat width)
     
     return self;
 }
-
-#ifdef _HasSD
 
 - (id)stretchyImageWithURLString:(NSString *)imageURLString imageSize:(CGSize)size
 {
@@ -299,24 +302,35 @@ CGFloat scaledSizeWithTargetWidth(CGSize size, CGFloat width)
     return self;
 }
 
-#endif
-
+/**
+ *  @author JyHu, 16-01-13 16:01:52
+ *
+ *  设置图片
+ *
+ *  @param image 要设置的图片
+ *
+ *  @since v1.0
+ */
 - (void)setupWithImage:(UIImage *)image
 {
     self.p_imageView.image = image;
     [self setupWithImageSize:image.size];
 }
 
+/**
+ *  @author JyHu, 16-01-13 16:01:10
+ *
+ *  根据图片的大小来布局页面
+ *
+ *  @param size 图片的设计大小
+ *
+ *  @since v1.0
+ */
 - (void)setupWithImageSize:(CGSize)size
 {
     self.p_stretchyBackgroundHeight = scaledSizeWithTargetWidth(size, self.p_viewWidth);
     self.p_visibleHeight = self.p_stretchyBackgroundHeight * self.p_visiblePercent;
     
-    [self setup];
-}
-
-- (void)setup
-{
     self.p_tableView.contentInset   = UIEdgeInsetsMake(self.p_visibleHeight - 64, 0, 0, 0);
     self.p_viewYOrigin              = -1 * self.p_stretchyBackgroundHeight;
     self.p_viewHeight               = self.p_stretchyBackgroundHeight;
@@ -391,7 +405,7 @@ CGFloat scaledSizeWithTargetWidth(CGSize size, CGFloat width)
         offset.y > -1 * _p_stretchyBackgroundHeight)
     {
         /**
-         *  @author 胡金友, 16-01-11 10:09:27
+         *  @author JyHu, 16-01-11 10:09:27
          *
          *  @brief  在默认最大可见范围的时候往下拉，至背景高度区间
          *
@@ -424,7 +438,7 @@ CGFloat scaledSizeWithTargetWidth(CGSize size, CGFloat width)
         else
         {
             /**
-             *  @author 胡金友, 16-01-11 10:09:26
+             *  @author JyHu, 16-01-11 10:09:26
              *
              *  @brief  当偏移量超过背景高度的时候，把偏移量定在一个固定值
              *
@@ -437,7 +451,7 @@ CGFloat scaledSizeWithTargetWidth(CGSize size, CGFloat width)
     else if (offset.y < -64)
     {
         /**
-         *  @author 胡金友, 16-01-11 10:09:44
+         *  @author JyHu, 16-01-11 10:09:44
          *
          *  @brief  矫正细微的偏移量
          *
@@ -446,7 +460,7 @@ CGFloat scaledSizeWithTargetWidth(CGSize size, CGFloat width)
         self.p_viewYOrigin = -1 * self.p_stretchyBackgroundHeight;
         
         /**
-         *  @author 胡金友, 16-01-11 10:09:27
+         *  @author JyHu, 16-01-11 10:09:27
          *
          *  @brief  在默认的最大可见范围往上提，不断缩小的时候
          *
@@ -457,7 +471,7 @@ CGFloat scaledSizeWithTargetWidth(CGSize size, CGFloat width)
     else
     {
         /**
-         *  @author 胡金友, 16-01-11 10:09:09
+         *  @author JyHu, 16-01-11 10:09:09
          *
          *  @brief  当往上提缩小到NavigationBar高度的临界值的时候，固定背景的frame
          *
