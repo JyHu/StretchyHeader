@@ -26,7 +26,7 @@
 		
 		`imageSize`表示图片的实际大小，这个必须按实际设置，否则最后加载出来后会出现有压缩或拉伸的情况；
         `placeHolderImage`表示在网络图片还没加载出来之前临时展示的图片，如果不设置的话，默认展示一种纯色的背景色（RGB:54,100,139）；
-        支持`SDWebImage`第三方的使用，如果不用SD，则默认使用GCD异步加载，但是暂不提供图片的缓存。
+        支持`SDWebImage`第三方的使用，如果项目中添加了SD，则会自动的引入并使用SD进行图片的加载与缓存；否则使用GCD异步加载，但是暂不提供图片的缓存。
         
 - 使用的时候，就一句代码，然后不用再做其他任何操作:
 	- 使用已经下载好的本地图片：`self.stretchyHeader = [[AUUStretchyHeader stretchForTable:self.tableView] stretchyImage:[UIImage imageNamed:@"pic.jpg"]];`
