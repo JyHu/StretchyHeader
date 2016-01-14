@@ -285,6 +285,7 @@ CGFloat scaledSizeWithTargetWidth(CGSize size, CGFloat width)
     if ([self.p_imageView respondsToSelector:@selector(sd_setImageWithURL:placeholderImage:completed:)])
     {
         // SD新版的加载图片的方法
+        __weak AUUStretchyHeader *weakSelf = self;
         [self.p_imageView sd_setImageWithURL:[NSURL URLWithString:imageURLString]
                             placeholderImage:image
                                    completed:^(UIImage *image,
@@ -292,7 +293,7 @@ CGFloat scaledSizeWithTargetWidth(CGSize size, CGFloat width)
                                                SDImageCacheType cacheType,
                                                NSURL *imageURL) {
                                        
-            self.indicatorView.hidden = YES;
+                                       [weakSelf.indicatorView removeFromSuperview];
         }];
     }
     else if ([self.p_imageView respondsToSelector:@selector(setImageWithURL:placeholderImage:completed:)])
@@ -308,7 +309,7 @@ CGFloat scaledSizeWithTargetWidth(CGSize size, CGFloat width)
                                             NSError *error,
                                             SDImageCacheType cacheType) {
                                     
-            weakSelf.indicatorView.hidden = YES;
+                                    [weakSelf.indicatorView removeFromSuperview];
         }];
 #   pragma clang diagnostic pop
     }
