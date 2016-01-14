@@ -76,6 +76,18 @@
 
 
 
+/**
+ *  @author JyHu, 16-01-14 09:01:32
+ *
+ *  根据目标宽度，比例计算高度
+ *
+ *  @param size  要计算的size大小
+ *  @param width 目标宽度
+ *
+ *  @return 希望的高度
+ *
+ *  @since v1.0
+ */
 extern CGFloat scaledSizeWithTargetWidth(CGSize size, CGFloat width);
 
 CGFloat scaledSizeWithTargetWidth(CGSize size, CGFloat width)
@@ -272,6 +284,7 @@ CGFloat scaledSizeWithTargetWidth(CGSize size, CGFloat width)
     
     if ([self.p_imageView respondsToSelector:@selector(sd_setImageWithURL:placeholderImage:completed:)])
     {
+        // SD新版的加载图片的方法
         [self.p_imageView sd_setImageWithURL:[NSURL URLWithString:imageURLString]
                             placeholderImage:image
                                    completed:^(UIImage *image,
@@ -284,8 +297,10 @@ CGFloat scaledSizeWithTargetWidth(CGSize size, CGFloat width)
     }
     else if ([self.p_imageView respondsToSelector:@selector(setImageWithURL:placeholderImage:completed:)])
     {
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wdeprecated-declarations"
+#   pragma clang diagnostic push
+        
+#   pragma clang diagnostic ignored "-Wdeprecated-declarations"
+        // SD旧版的加载图片的方法，需要取消掉警告提示
         __weak AUUStretchyHeader *weakSelf = self;
         [self.p_imageView setImageWithURL:[NSURL URLWithString:imageURLString]
                          placeholderImage:image
@@ -295,7 +310,7 @@ CGFloat scaledSizeWithTargetWidth(CGSize size, CGFloat width)
                                     
             weakSelf.indicatorView.hidden = YES;
         }];
-#pragma clang diagnostic pop
+#   pragma clang diagnostic pop
     }
     else
     {
@@ -523,14 +538,14 @@ CGFloat scaledSizeWithTargetWidth(CGSize size, CGFloat width)
     /**
      *  @author JyHu, 16-01-13 17:01:16
      *
-     *  如果有等待视图的话，需要动态的设置它居中
+     *  如果有等待视图的话，需要动态的设置它在除去statusBar后居中
      *
      *  @since v1.0
      */
     if (self.indicatorView != nil && self.indicatorView.superview == self)
     {
         self.indicatorView.center = CGPointMake(self._viewWidth / 2.0,
-                                                self.p_stretchyBackgroundHeight - headerHeight / 2.0);
+                                                self.p_stretchyBackgroundHeight - headerHeight / 2.0 + 10);
     }
 }
 
