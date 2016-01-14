@@ -15,7 +15,7 @@
 	- `stretchForTable:`
 	- `stretchForTable:visiablePercent:`
 		- 第一个参数`table`是要进行图片拉伸的图片加载到的`table`，
-		- 第二个参数`percent`是想要在不拉伸的情况下需要展示的比例。
+		- 第二个参数`percent`是想要在不滑动的情况下需要展示的图片部分占整个图片实际高度比例。
 
 - 图片展示是按图片的宽度以图片的中间为准，滑到最小的时候也是展示中间的64像素的位置，所以使用的时候可以注意设计一下图片。对于图片的设置，提供了三个方法：
 	1. 直接展示图片
@@ -25,13 +25,12 @@
 		- `stretchyImageWithURLString:placeHolderImage:imageSize:`
 		
 		`imageSize`表示图片的实际大小，这个必须按实际设置，否则最后加载出来后会出现有压缩或拉伸的情况；
-        `placeHolderImage`表示在网络图片还没加载出来之前临时展示的图片，如果不设置的话，默认展示一种纯色的背景色（RGB:54,100,139   ![color](color.jpeg)）；
+        `placeHolderImage`表示在网络图片还没加载出来之前临时展示的图片，如果不设置的话，默认展示一种纯色的背景色（RGB:54,100,139）；
         支持`SDWebImage`第三方的使用，如果不用SD，则默认使用GCD异步加载，但是暂不提供图片的缓存。
         
 - 使用的时候，就一句代码，然后不用再做其他任何操作:
-`self.stretchyHeader = [[AUUStretchyHeader stretchForTable:self.tableView] stretchyImage:[UIImage imageNamed:@"pic.jpg"]];`
-或者使用网络图片
-`self.stretchyHeader = [[AUUStretchyHeader stretchForTable:self.tableView] stretchyImageWithURLString:@"http://pic37.nipic.com/20140209/8821914_163234218136_2.jpg" imageSize:CGSizeMake(1024, 640)]`
+	- 使用已经下载好的本地图片：`self.stretchyHeader = [[AUUStretchyHeader stretchForTable:self.tableView] stretchyImage:[UIImage imageNamed:@"pic.jpg"]];`
+	- 或者使用网络图片：`self.stretchyHeader = [[AUUStretchyHeader stretchForTable:self.tableView] stretchyImageWithURLString:@"http://pic37.nipic.com/20140209/8821914_163234218136_2.jpg" imageSize:CGSizeMake(1024, 640)]`
 
 ###注意
 
@@ -40,9 +39,20 @@
 
 ----
 
+----
 
-###附，测试的效果图
 
+###附图
+
+----
+
+----
+
+**RGB:54,100,139**
+
+![color](color.png)
+
+------
 
 **图一**
 
