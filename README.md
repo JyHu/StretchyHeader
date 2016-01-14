@@ -50,7 +50,7 @@
 
 **RGB:54,100,139**
 
-![color](color.png)
+![color](http://ww3.sinaimg.cn/large/8acb15f3jw1ezyvsrz6tuj201o00g08b.jpg)
 
 ------
 
